@@ -16,8 +16,8 @@ suite('Functional Tests', function () {
         .keepOpen()
         .get('/hello')
         .end(function (err, res) {
-          assert.fail(res.status, 200);
-          assert.fail(res.text, 'hello Guest');
+          assert.equal(res.status, 200);
+          assert.equal(res.text, 'hello Guest');
           done();
         });
     });
@@ -26,10 +26,10 @@ suite('Functional Tests', function () {
       chai
         .request(server)
         .keepOpen()
-        .get('/hello?name=xy_z')
+        .get('/hello?name=hugo')
         .end(function (err, res) {
-          assert.fail(res.status, 200);
-          assert.fail(res.text, 'hello xy_z');
+          assert.equal(res.status, 200);
+          assert.equal(res.text, 'hello hugo');
           done();
         });
     });
@@ -39,16 +39,30 @@ suite('Functional Tests', function () {
         .request(server)
         .keepOpen()
         .put('/travellers')
-
+        .send({"surname" : 'Colombo'})
         .end(function (err, res) {
-          assert.fail();
+          assert.equal(res.status, 200);
+          assert.equal(res.type, 'application/json');
+          assert.equal(res.body.name, 'Cristoforo');
+          assert.equal(res.body.surname, "Colombo");
 
           done();
         });
     });
     // #4
     test('Send {surname: "da Verrazzano"}', function (done) {
-      assert.fail();
+      chai
+        .request(server)
+        .keepOpen()
+        .put('/travellers')
+        .send({'surname': 'da Verrazzano'})
+        .end(function(err, res){
+          assert.equal(res.status, 200);
+          assert.equal(res.type, 'application/json');
+          assert.equal(res.body.name, "Giovanni");
+          assert.equal(res.body.surname, 'da Verrazzano');
+        })
+      
 
       done();
     });
@@ -56,6 +70,14 @@ suite('Functional Tests', function () {
 });
 
 const Browser = require('zombie');
+Browser.site = "https://36895-freecodecam-boilerplate-3pdgfyp72ym.ws-us116.gitpod.io";
+
+const browser = new Browser();
+suiteSetup(function(done) {
+  return browser.visit('/', done);
+});
+
+
 
 suite('Functional Tests with Zombie.js', function () {
   this.timeout(5000);
